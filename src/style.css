@@ -2,6 +2,8 @@
 {
     margin: 0;
     padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
 }
 
 /* html,
@@ -22,21 +24,30 @@ html
 }
 
 
-.section
+h1
 {
-    display: flex;
-    align-items: center;
-    height: 100vh;
-    position: relative;
-    font-family: 'Cabin', sans-serif;
-    color: #ffeded;
-    text-transform: uppercase;
-    font-size: 7vmin;
-    padding-left: 10%;
-    padding-right: 10%;
+    text-align: center;
+    font-size: 6rem;
+    
 }
 
-section:nth-child(odd)
+.outerDiv{
+    /* border: 1px solid red; */
+    display: block;
+    max-width: fit-content;
+    margin-inline: auto;
+    
+}
+
+.subheading {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.75rem;
+
+}
+
+
+/* section:nth-child(odd)
 {
     justify-content: flex-end;
-}
+} */

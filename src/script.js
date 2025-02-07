@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 import GUI from 'lil-gui';
 
@@ -26,8 +27,29 @@ gui
  * Textures
  */
 const textureLoader = new THREE.TextureLoader()
-const gradientTexture = textureLoader.load('./textures/gradients/3.jpg')
-gradientTexture.magFilter = THREE.NearestFilter
+const fabricAO = textureLoader.load('/textures/Wood_Wicker_010_SD/Wood_Wicker_010_ambientOcclusion.jpg');
+const fabricColor = textureLoader.load('/textures/Wood_Wicker_010_SD/Wood_Wicker_010_basecolor.jpg');
+const fabricHeight = textureLoader.load('/textures/Wood_Wicker_010_SD/Wood_Wicker_010_height.jpg');
+const fabricNormal = textureLoader.load('/textures/Wood_Wicker_010_SD/Wood_Wicker_010_normal.jpg');
+const fabricRough = textureLoader.load('/textures/Wood_Wicker_010_SD/Wood_Wicker_010_roughness.jpg');
+const fabricAlpha = textureLoader.load('/textures/Wood_Wicker_010_SD/Wood_Wicker_010_opacity.jpg')
+
+fabricColor.colorSpace = THREE.SRGBColorSpace;
+fabricColor.wrapS = THREE.RepeatWrapping;
+fabricColor.wrapT = THREE.RepeatWrapping;
+
+fabricAO.wrapS = THREE.RepeatWrapping;
+fabricAO.wrapT = THREE.RepeatWrapping;
+
+fabricHeight.wrapS = THREE.RepeatWrapping;
+fabricHeight.wrapT = THREE.RepeatWrapping;
+
+fabricNormal.wrapS = THREE.RepeatWrapping;
+fabricNormal.wrapT = THREE.RepeatWrapping;
+
+fabricRough.wrapS = THREE.RepeatWrapping;
+fabricRough.wrapT = THREE.RepeatWrapping;
+
 
 /**
  * Base
@@ -45,26 +67,61 @@ const scene = new THREE.Scene()
  * Lights
  */
 
-const directionalLight = new THREE.DirectionalLight('#fffff', 3)
-directionalLight.position.set(1, 1, 0)
+const directionalLight = new THREE.SpotLight("#ffffff", 50, 6, Math.PI*0.2, .2)
+directionalLight.position.set(2, 1, 3)
 scene.add(directionalLight)
+
+const ambientLight = new THREE.AmbientLight('#ffffff', 1)
+scene.add(ambientLight)
 /**
  * Objects
  */
-const material = new THREE.MeshToonMaterial({ color: parameters.materialColor, gradientMap: gradientTexture })
+const material = new THREE.MeshPhysicalMaterial({
+    
+});
+material.map = fabricColor
+material.aoMap  = fabricAO;
+material.aoMapIntensity = 1.7
+material.displacementMap = fabricHeight;
+material.displacementScale = .2
+material.normalMap = fabricNormal
+material.normalScale.set(0.9,0.9)
+material.roughness = fabricRough;
+material.transparent = true;
+material.alphaMap = fabricAlpha;
+
+
+
+material.wireframe = false;
 
 const objectsDistance = 4;
-const mesh1 = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(.8, .35, 100, 16),
+const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 64, 64),
     material
 )
 
-mesh1.position.y = - objectsDistance * 0
+const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(7,4,50,50),
+    new THREE.MeshStandardMaterial({color: "orange"})
 
-mesh1.position.x = 2
-scene.add(mesh1)
+)
 
-const sectionMeshes = [mesh1]
+plane.receiveShadow = true;
+
+sphere.castShadow = true;
+sphere.receiveShadow = true;
+directionalLight.castShadow = true;
+
+const directionalLightHelper = new THREE.SpotLightHelper(directionalLight)
+
+plane.rotation.x = -Math.PI*.3;
+plane.position.set(0,-1,-1)
+sphere
+scene.add(plane)
+scene.add(sphere)
+// scene.add(mesh1)
+
+const sectionMeshes = [sphere]
 /**
  * Particles
  */
@@ -125,8 +182,9 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-
-
+renderer.shadowMap.enabled = true;
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
 /**
  * Cursor
  *
